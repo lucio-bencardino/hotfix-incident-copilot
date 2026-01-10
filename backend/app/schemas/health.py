@@ -1,7 +1,7 @@
-from pydantic import BaseModel
+from app.schemas.base import CamelModel
 
 
-class HealthResponse(BaseModel):
+class HealthResponse(CamelModel):
     status: str
     version: str
     api_version: str

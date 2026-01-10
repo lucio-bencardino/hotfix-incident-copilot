@@ -11,4 +11,4 @@ def test_health_check(client):
     data = response.json()
     assert data["status"] == "ok"
     assert data["version"] == settings.VERSION
-    assert data["api_version"] == settings.API_VERSION
+    assert data["apiVersion"] == settings.API_VERSION
