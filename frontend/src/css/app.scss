@@ -1,0 +1,43 @@
+:root {
+    --bg-page: #f8fafc;
+    --bg-surface: #ffffff;
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
+    --border-color: #e5e7eb;
+}
+
+body.body--dark {
+    --bg-page: #0f172a;
+    --bg-surface: #1e293b;
+    --text-main: #f3f4f6;
+    --text-muted: #9ca3af;
+    --border-color: #374151;
+}
+
+.my-bg-page {
+    background-color: var(--bg-page) !important;
+    color: var(--text-main) !important;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.my-surface {
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.text-main {
+    color: var(--text-main) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+body.body--dark .q-field__native,
+body.body--dark .q-field__prefix,
+body.body--dark .q-field__suffix,
+body.body--dark .q-field__input {
+    color: var(--text-main) !important;
+}
