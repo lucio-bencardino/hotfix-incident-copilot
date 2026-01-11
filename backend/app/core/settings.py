@@ -12,6 +12,8 @@ class Settings(BaseSettings):
 
     LOG_LEVEL: str = "INFO"
 
+    ALLOWED_ORIGINS: list[str] = []
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
