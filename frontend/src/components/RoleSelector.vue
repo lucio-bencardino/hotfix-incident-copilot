@@ -5,7 +5,7 @@
       <p class="text-subtitle1 text-muted">Select your expert persona to tune the AI model.</p>
     </div>
 
-    <div class="row q-gutter-xl justify-center full-width">
+    <div class="row justify-center full-width cards-container">
       <div
         v-for="role in rolesList"
         :key="role.id"
@@ -40,6 +40,10 @@ const getBgClass = (role: RoleDefinition) => {
 </script>
 
 <style scoped>
+.cards-container {
+  gap: 48px;
+}
+
 .role-card {
   width: 240px;
   height: 260px;
