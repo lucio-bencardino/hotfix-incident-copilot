@@ -1,6 +1,7 @@
 import json
 import logging
 
+from app.core.prompts import get_system_prompt
 from app.core.settings import settings
 from openai import AsyncOpenAI
 
@@ -10,30 +11,17 @@ logger = logging.getLogger(__name__)
 class AIService:
     @staticmethod
     async def generate_incident_plan(
-        description: str, logs: str | None, context: str | None
+        description: str, logs: str | None, context: str | None, role: str | None
     ) -> dict:
         api_key = settings.AI_API_KEY
-        # check for mock key
+
+        # Check for mock key
         if not api_key or "mock" in api_key.lower():
-            return AIService._get_mock_incident_plan()
+            return AIService._get_mock_incident_plan(role)
 
         client = AsyncOpenAI(api_key=api_key)
 
-        system_prompt = """
-        You are a Senior Site Reliability Engineer (SRE).
-        Your task is to generate a structured remediation plan for a technical incident.
-        
-        OUTPUT FORMAT (JSON ONLY):
-        {
-            "steps": ["Step 1 description", "Step 2 command to run"],
-            "warnings": ["Warning about data loss", "Warning about downtime"]
-        }
-
-        STYLE GUIDELINES:
-        - Steps should be actionable (e.g., 'Check disk space with df -h', 'Restart nginx').
-        - Warnings must highlight risks (data loss, service interruption).
-        - Be direct. No filler words.
-        """
+        system_prompt = get_system_prompt(role)
 
         user_content = f"Incident Description: {description}\n"
         if context:
@@ -54,28 +42,43 @@ class AIService:
 
             content = response.choices[0].message.content
             if content is None:
-                logger.error("AI Service Error: Received empty content from AI model.")
                 raise ValueError("Received empty content from AI model.")
-            logger.debug(f"AI Response: {content}")
 
+            logger.info(f"AI Plan generated successfully for role: {role}")
             return json.loads(content)
 
         except Exception as e:
             logger.error(f"AI Service Error: {e}")
-            return AIService._get_mock_incident_plan()
+            return AIService._get_mock_incident_plan(role)
 
     @staticmethod
-    def _get_mock_incident_plan() -> dict:
-        logger.warning("USING MOCK AI SERVICE")
+    def _get_mock_incident_plan(role: str | None) -> dict:
+        logger.warning(f"USING MOCK AI SERVICE (Role: {role})")
 
+        if role == "dev":
+            return {
+                "steps": [
+                    "Check `package.json` for version mismatch on `axios` library.",
+                    "Review recent commit history for changes in `AuthService.ts`.",
+                    "Run unit tests locally with `npm test -- --grep 'Auth'` to reproduce the error.",
+                    "If reproducible, implement a try-catch block around the failing call.",
+                ],
+                "warnings": [
+                    "Hotfixing directly in production might bypass CI/CD checks.",
+                    "Ensure backward compatibility with mobile clients.",
+                ],
+            }
+
+        # Default DevOps/SRE
         return {
             "steps": [
-                "Step 1",
-                "Step 2",
-                "Step 3",
+                "Check pod status with `kubectl get pods -n production`.",
+                "Inspect pod logs using `kubectl logs -l app=payment-service --tail=100`.",
+                "Check database connection pool metrics in Grafana.",
+                "If pods are crashing (OOMKilled), increase memory limits in `deployment.yaml`.",
             ],
             "warnings": [
-                "Warning 1",
-                "Warning 2",
+                "Restarting the database might cause temporary downtime (approx 30s).",
+                "Ensure you have a recent snapshot before applying schema changes.",
             ],
         }
