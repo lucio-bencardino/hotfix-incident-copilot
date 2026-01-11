@@ -5,7 +5,7 @@ class IncidentRequest(CamelModel):
     description: str
     logs: str | None = None
     context: str | None = None
-
+    role: str | None = None
 
 class IncidentResponse(CamelModel):
     steps: list[str]
